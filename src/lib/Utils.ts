@@ -1,29 +1,35 @@
-import { User } from './User'
-
-export function toId(text : string) {
+export function toId(text : string) : string {
 	return String(text).toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-export function isVoice(user : User) {
-	return (user.rank === '+'
-	|| isDriver(user))
+export function isVoice(rank : string) : boolean {
+	return (rank.substr(0, 1) === '+'
+	|| isDriver(rank))
 }
 
-export function isDriver(user : User) {
-	return (user.rank === '%'
-	|| isModerator(user))
+export function isDriver(rank : string) : boolean {
+	return (rank.substr(0, 1) === '%'
+	|| isModerator(rank))
 }
 
-export function isModerator(user : User) {
-	return (user.rank === '@'
-	|| isRoomOwner(user))
+export function isModerator(rank : string) : boolean {
+	return (rank.substr(0, 1) === '@'
+	|| isRoomOwner(rank))
 }
 
-export function isRoomOwner(user : User) {
-	return (user.rank === '#'
-	|| isAdministrator(user))
+export function isRoomOwner(rank : string) : boolean {
+	return (rank.substr(0, 1) === '#'
+	|| isAdministrator(rank))
 }
 
-export function isAdministrator(user : User) {
-	return (user.rank === '&')
+export function isAdministrator(rank : string) : boolean {
+	return (rank.substr(0, 1) === '&')
+}
+
+export function sanitizeUsername(username : string) : string {
+	return username.substr(1).trim().toLowerCase()
+}
+
+export function getRank(username : string) : string {
+	return username.substr(0, 1)
 }

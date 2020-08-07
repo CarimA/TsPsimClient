@@ -5,7 +5,7 @@ This is a TypeScript library that handles connection logic to Pokemon Showdown s
 ## Features
 
 - Promise-based messages
-- Automatically synchronised room and user data (including alt-tracking)
+- Automatically synchronized room and user data (including alt-tracking)
 - yeah, that's about it for now, but hey it's not JavaScript
 
 ## Installation
@@ -15,6 +15,23 @@ TsPsimClient is available on npm, simply open up your terminal, point to your wo
 `npm install ts-psim-client --save`
 
 If it's already in your package.json, just run `npm install`. If you have it installed and want to update, run `npm update ts-psim-client`.
+
+## Version History
+
+### Version 1.1.0
+
+ - Fixed timeout/autoReconnect being used in the wrong places
+ - Changed auth handling to be per-message rather than per-user
+	- Added `Message#rank()`
+ - Rooms now tracks users who have auth, even after they change display names
+	- Added `Room#isVoice(User)`, `Room#isDriver(User)`, `Room#isModerator(User)`, `Room#isRoomOwner(User)` and `Room#isAdministrator(User)` which can check the user across renames. `Utils.isVoice(string)`, etc. can still be used to check individual message auth
+ - Changed UserCollection to index users by a sanitized username without auth symbol, keeping user state across rooms
+ - Added type signatures for the remainder of the functions (`() : void`, etc)
+ - Cleanup removing unused imports
+
+### Version 1.0.0
+
+ - Initial Library
 
 ## Example Setup
 

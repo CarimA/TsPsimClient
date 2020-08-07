@@ -1,29 +1,35 @@
-import { Client, Room } from '../Index'
+import { Client, Room, Username, Utils } from '../Index'
+import { v4 as uuidv4 } from 'uuid';
 
 export class User {
-	private _name : string
+	private _Id : string
+	private _name : Username
 	private _client : Client
 	private _rooms : Array<Room>
-	private _oldNames : Array<string>
+	private _oldNames : Array<Username>
 
 	constructor(name : string, client : Client) {
-		this._name = name
+		this._Id = uuidv4();
+		this._name = new Username(name)
 		this._client = client
 		this._rooms = new Array<Room>()
-		this._oldNames = new Array<string>()
+		this._oldNames = new Array<Username>()
 	}
 
-	public rename(newName : string) {
+	public rename(newName : string) : void {
+		this._client.debug(`Renaming ${this._name.displayname} to ${newName}`)
 		this._oldNames.push(this._name)
-		this._name = newName
+		this._name = new Username(newName)
 	}
 
-	public join(room : Room) {
+	public join(room : Room) : void {
+		this._client.debug(`${this._name.displayname} joined ${room.name}`)
 		this._rooms.push(room)
 		room.join(this)
 	}
 
-	public leave(room : Room) {
+	public leave(room : Room) : void {
+		this._client.debug(`${this._name.displayname} left ${room.name}`)
 		const index = this._rooms.indexOf(room)
 		if (index > -1)
 			this._rooms.splice(index, 1)
@@ -35,19 +41,23 @@ export class User {
 		return this._client.send(`|/w ${this.username}, ${message}`)
 	}
 
-	public get username() {
-		return this._name.substr(1).trim().toLowerCase()
+	public get Id() : string {
+		return this._Id
 	}
 
-	public get rank() {
-		return this._name.substr(0, 1)
+	public get username() : string {
+		return this._name.username
 	}
 
-	public get displayName() {
-		return this._name.trim()
+	public get displayName() : string {
+		return this._name.displayname
 	}
 
-	public get roomCount() {
+	public get roomCount() : number {
 		return this._rooms.length
+	}
+
+	public get alts() : Array<Username> {
+		return this._oldNames
 	}
 }

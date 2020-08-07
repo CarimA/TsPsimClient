@@ -1,32 +1,28 @@
-import { User, Client, Room } from '../Index'
+import { User, Client, Utils } from '../Index'
 
 export class UserCollection {
 	private _client : Client
-	private _users : {[key: string]: User}
+	private _users : Array<User>
 
 	constructor(client : Client) {
-		this._users = {}
+		this._users = new Array<User>()
 		this._client = client
 	}
 
 	public find(username : string) : User {
-		username = username.trim()
-		if (!this.get(username))
-			this._users[username] = new User(username, this._client)
+		const key = Utils.sanitizeUsername(username)
+		let user = this.get(key)
 
-		return this.get(username)
-	}
-
-	public remove(user : User) : boolean {
-		if (this._users[user.username]) {
-			delete this._users[user.username]
-			return true
+		if (!user) {
+			this._client.debug(`Could not find ${username} with key ${key}, creating new user`)
+			const newLength = this._users.push(new User(username, this._client))
+			user = this._users[newLength - 1]
 		}
 
-		return false
+		return user
 	}
 
-	private get(username : string) : User {
-		return this._users[username]
+	private get(username : string) : User | undefined {
+		return this._users.find(user => user.username === username)
 	}
 }

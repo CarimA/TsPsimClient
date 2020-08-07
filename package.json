@@ -1,11 +1,12 @@
 {
   "name": "ts-psim-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A TypeScript Pokemon Showdown client library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepare": "tsc"
+    "prepare": "tsc",
+    "relink": "npm run prepare && sudo npm link"
   },
   "repository": {
     "type": "git",
@@ -19,8 +20,10 @@
   },
   "homepage": "https://github.com/CarimA/TsPsimClient#readme",
   "dependencies": {
+    "@types/uuid": "^8.0.1",
     "@types/ws": "^7.2.6",
     "strongly-typed-events": "^1.6.16",
+    "uuid": "^8.3.0",
     "ws": "^7.3.1"
   }
 }

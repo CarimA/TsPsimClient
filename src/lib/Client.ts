@@ -4,7 +4,6 @@ import * as https from 'https'
 import { Room, User, QueuedMessage, RoomMessage, PrivateMessage, UserCollection, RoomCollection, Utils, 
 	SimpleEventDispatcher, EventDispatcher} from '../Index'
 
-
 export class Client {
 	private _socket? : WebSocket
 
@@ -100,9 +99,9 @@ export class Client {
 
 	private retryConnection() : void {
 		this._socket?.close()
-		if (this._autoReconnect) {
-			this._debug(`Retrying connection in ${this._autoReconnect / 1000} seconds`)
-			setTimeout(this.connect.bind(this), this._autoReconnect, true)
+		if (this._timeout) {
+			this._debug(`Retrying connection in ${this._timeout / 1000} seconds`)
+			setTimeout(this.connect.bind(this), this._timeout, true)
 		}
 	}
 
@@ -164,7 +163,7 @@ export class Client {
 			messageType(roomInstance, isIntro, ...args.slice(2))
 	}
 
-	private createMessageTypes() {
+	private createMessageTypes() : void {
 		this._messageTypes = {
 			'init': this.handleInit.bind(this),
 			'deinit': this.handleDeinit.bind(this),
@@ -183,16 +182,16 @@ export class Client {
 		}
 	}
 
-	private handleInit(room : Room, isIntro : boolean, ...args : Array<string>) { 
+	private handleInit(room : Room, isIntro : boolean, ...args : Array<string>) : void { 
 		this._onRoomJoin.dispatch(this, room)
 	}
 
-	private handleDeinit(room : Room, isIntro : boolean, ...args : Array<string>) { 
+	private handleDeinit(room : Room, isIntro : boolean, ...args : Array<string>) : void { 
 		this._onRoomLeave.dispatch(this, room)
 		this._rooms.remove(room)
 	}
 
-	private handleChallstr(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleChallstr(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		this._challstr = {
 			id: args[0],
 			str: args[1]
@@ -200,7 +199,7 @@ export class Client {
 		this._onReady.dispatch(this)
 	}
 
-	private handleUpdateUser(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleUpdateUser(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		if (!args[0].startsWith(' Guest')) {
 			this._debug(`Successfully logged in as ${args[0].substr(1)}`)
 			this._isLoggedIn = true
@@ -208,56 +207,66 @@ export class Client {
 		}
 	}
 
-	private handleChat(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleChat(room : Room, isIntro : boolean, ...args : Array<string>) : void {
+		if (isIntro)
+			return;
+
 		const username = args[0]
 		const user = this._users.find(username)
 		const text = args.slice(1).join('|')
-		const message = new RoomMessage(user, text, room, isIntro)
+		const message = new RoomMessage(Utils.getRank(username), user, text, room, isIntro)
 		room.handleMessage(message)
+		room.assignAuth(user, username)
 	}
 
-	private handleTimestampedChat(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleTimestampedChat(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		const timestamp = args[0]
 		const username = args[1]
 		const user = this._users.find(username)
 		const text = args.slice(2).join('|')
-		const message = new RoomMessage(user, text, room, isIntro)
+		const message = new RoomMessage(Utils.getRank(username), user, text, room, isIntro)
 		room.handleMessage(message)
+		room.assignAuth(user, username)
 	}
 
-	private handlePrivateMessage(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handlePrivateMessage(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		const username = args[0]
 		const user = this._users.find(username)
 		const text = args.slice(2).join('|')
-		const message = new PrivateMessage(user, text)
+		const message = new PrivateMessage(Utils.getRank(username), user, text)
 		this._onPrivateMessage.dispatch(user, message)
 	}
 
-	private handleJoin(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleJoin(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		const username = args.join('|')
 		const user = this._users.find(username)
 		user.join(room)
+		room.assignAuth(user, username)
 	}
 
-	private handleLeave(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleLeave(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		const username = args.join('|')
 		const user = this._users.find(username)
 		user.leave(room)
-
-		if (user.roomCount <= 0)
-			this._users.remove(user)
 	}
 
-	private handleRename(room : Room, isIntro : boolean, ...args : Array<string>) {
+	private handleRename(room : Room, isIntro : boolean, ...args : Array<string>) : void {
 		const newUsername = args[0]
-		const oldUsername = args[1]
-		this._users.find(oldUsername).rename(newUsername)
+		let oldUsername = args[1]
+
+		// we do this because old usernames are already "sanitized" and will index wrong
+		if (!Utils.isVoice(oldUsername))
+			oldUsername = ` ${oldUsername}`
+
+		var user = this._users.find(oldUsername)
+		user.rename(newUsername)
+		room.assignAuth(user, newUsername)
 	}
 
-	public login(username : string, password : string, retryLogin : boolean = false) {
+	public login(username : string, password : string, retryLogin : boolean = false) : void {
 		const retry = () => {
-			this._debug(`Retrying login in 30 seconds`)
-			setTimeout(this.login.bind(this), 30 * 1000, username, password, retryLogin)
+			this._debug(`Retrying login in ${this._autoReconnect /  1000} seconds`)
+			setTimeout(this.login.bind(this), this._autoReconnect, username, password, retryLogin)
 		}
 
 		const data = `act=login&name=${Utils.toId(username)}&pass=${password}&challengekeyid=${this._challstr.id}&challenge=${this._challstr.str}`;
@@ -310,7 +319,7 @@ export class Client {
 		request.end()
 	}
 
-	private handleQueue() {
+	private handleQueue() : void {
 		const throttle = 500
 		setInterval(() => {
 			let message = this._queuedMessages.splice(0, 3)
@@ -320,7 +329,7 @@ export class Client {
 		}, throttle)
 	}
 
-	private sendQueued(queuedMessage : QueuedMessage) {
+	private sendQueued(queuedMessage : QueuedMessage) : void {
 		if (!queuedMessage)
 			return;
 
@@ -361,6 +370,10 @@ export class Client {
 
 	public async setStatus(status : string) : Promise<void> {
 		return this.send(`|/status ${status}`)
+	}
+
+	public get debug() {
+		return this._debug
 	}
 
 	public get onConnect() {
