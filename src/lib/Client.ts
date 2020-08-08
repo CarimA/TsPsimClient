@@ -322,6 +322,9 @@ export class Client {
 	private handleQueue() : void {
 		const throttle = 500
 		setInterval(() => {
+			if (!this.isConnected)
+				return;
+				
 			let message = this._queuedMessages.splice(0, 3)
 			for (let index = 0; index < message.length; index++) {
 				this.sendQueued(message[index])

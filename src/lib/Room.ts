@@ -102,19 +102,18 @@ export class Room {
 		return this._administrators.includes(user)
 	}
 
-	public async createTournament(name : string, format : string = 'gen8ou', type : string = '2 elimination', playerCap : number = 32,
+	public async createTournament(name? : string, format : string = 'gen8ou', type : string = '2 elimination', playerCap : number = 32,
 		autostart : number = 5, autodq : number = 1, scouting : boolean = true, forceTimer : boolean = true) : Promise<void> {
 		if (type.endsWith('elimination')) {
 			const rounds = type.split(' ')[0]
-			await this.send(`/tour new ${format}, 'elimination', ${rounds}`)
+			await this.send(`/tour new ${format}, elimination, ${playerCap}, ${rounds}`)
 		} else {
-			await this.send(`/tour new ${format}, ${type}`)
+			await this.send(`/tour new ${format}, ${type}, ${playerCap}`)
 		}
 
 		if (name) 
 			await this.send(`/tour name ${name}`)
 
-		await this.send(`/tour cap ${playerCap}`)
 		await this.send(`/tour autostart ${autostart}`)
 		await this.send(`/tour autodq ${autodq}`)
 		await this.send(`/tour scouting ${scouting ? 'allow' : 'disallow'}`)

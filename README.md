@@ -18,6 +18,12 @@ If it's already in your package.json, just run `npm install`. If you have it ins
 
 ## Version History
 
+### Version 1.1.1
+
+ - Fixed an issue with the message queue still processing while not connected to Pokemon Showdown
+ - Fixed an issue with `Room#createTournament` not allowing it to set double/triple/etc-elimination tournaments.
+ - Added `Utils.delay(number)`, example use: `await Utils.delay(1000)` to halt async method for 1 second
+
 ### Version 1.1.0
 
  - Fixed timeout/autoReconnect being used in the wrong places

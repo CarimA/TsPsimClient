@@ -33,3 +33,7 @@ export function sanitizeUsername(username : string) : string {
 export function getRank(username : string) : string {
 	return username.substr(0, 1)
 }
+
+export async function delay(milliseconds : number) : Promise<void> {
+	return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
