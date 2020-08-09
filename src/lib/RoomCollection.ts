@@ -10,10 +10,14 @@ export class RoomCollection {
 	}
 	
 	public find(name : string) : Room {
-		if (!this.get(name))
-			this._rooms[name] = new Room(name, this._client)
+		let room = this.get(name)
 
-		return this.get(name)
+		if (!room) {
+			room = new Room(name, this._client)
+			this._rooms[name] = room
+		}
+		
+		return room
 	}
 
 	public remove(room : Room) : boolean {
@@ -25,7 +29,7 @@ export class RoomCollection {
 		return false
 	}
 
-	private get(name : string) : Room {
+	public get(name : string) : Room | undefined {
 		return this._rooms[name]
 	}
 

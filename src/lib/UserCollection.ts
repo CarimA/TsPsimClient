@@ -22,7 +22,7 @@ export class UserCollection {
 		return user
 	}
 
-	private get(username : string) : User | undefined {
+	public get(username : string) : User | undefined {
 		return this._users.find(user => user.username === username)
 	}
 }

@@ -375,6 +375,14 @@ export class Client {
 		return this.send(`|/status ${status}`)
 	}
 
+	public getRoom(room : string) : Room | undefined {
+		return this._rooms.get(room)
+	}
+
+	public getUser(username : string) : User | undefined {
+		return this._users.get(username)
+	}
+
 	public get debug() {
 		return this._debug
 	}
