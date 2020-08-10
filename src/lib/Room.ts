@@ -103,7 +103,7 @@ export class Room {
 	}
 
 	public async createTournament(name? : string, format : string = 'gen8ou', type : string = '2 elimination', playerCap : number = 32,
-		autostart : number = 5, autodq : number = 1, scouting : boolean = true, forceTimer : boolean = true) : Promise<void> {
+		autostart : number = 5, autodq : number = 1, rules : Array<string> = [], scouting : boolean = true, forceTimer : boolean = true) : Promise<void> {
 		if (type.endsWith('elimination')) {
 			const rounds = type.split(' ')[0]
 			await this.send(`/tour new ${format}, elimination, ${playerCap}, ${rounds}`)
@@ -113,6 +113,9 @@ export class Room {
 
 		if (name) 
 			await this.send(`/tour name ${name}`)
+
+		if (rules)
+			await this.send(`/tour rules ${rules.join(',')}`)
 
 		await this.send(`/tour autostart ${autostart}`)
 		await this.send(`/tour autodq ${autodq}`)
