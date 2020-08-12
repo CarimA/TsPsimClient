@@ -18,6 +18,12 @@ If it's already in your package.json, just run `npm install`. If you have it ins
 
 ## Version History
 
+### Version 1.1.2
+
+ - Added `Client#getUser`
+ - Added `Client#getRoom`
+ - Added a rules parameter to `Room#createTournament`
+
 ### Version 1.1.1
 
  - Fixed an issue with the message queue still processing while not connected to Pokemon Showdown
