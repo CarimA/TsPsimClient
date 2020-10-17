@@ -410,4 +410,8 @@ export class Client {
 	public get onRoomLeave() {
 		return this._onRoomLeave.asEvent()
 	}
+
+	public get onPrivateMessage() {
+		return this._onPrivateMessage.asEvent();
+	}
 }

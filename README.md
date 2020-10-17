@@ -18,6 +18,10 @@ If it's already in your package.json, just run `npm install`. If you have it ins
 
 ## Version History
 
+### Version 1.1.5
+ - Added `Client#onPrivateMessage`
+ - Various fixes
+
 ### Version 1.1.2
 
  - Added `Client#getUser`
