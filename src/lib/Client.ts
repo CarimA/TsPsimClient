@@ -55,7 +55,7 @@ export class Client {
 		if (this.isConnected())
 			this._debug('Already connected to Pokemon Showdown')
 		
-		const link = `ws://${this._server}:${this._port}/showdown/${100 + ~~(Math.random() * 900)}/${Array.from({ length: 8 }).map(() => 'abcdefghijklmnopqrstuvwxyz0123456789_'[~~(Math.random() * 37)]).join('')}/websocket`
+		const link = `wss://${this._server}:${this._port}/showdown/${100 + ~~(Math.random() * 900)}/${Array.from({ length: 8 }).map(() => 'abcdefghijklmnopqrstuvwxyz0123456789_'[~~(Math.random() * 37)]).join('')}/websocket`
 		
 		this._socket = new WebSocket(link)
 		this._rooms = new RoomCollection(this)
