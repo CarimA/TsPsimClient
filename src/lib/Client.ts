@@ -32,8 +32,8 @@ export class Client {
 	private _onPrivateMessage : EventDispatcher<User, PrivateMessage> = new EventDispatcher<User, PrivateMessage>()
 
 	constructor(opts : any) {
-		this._server = opts.server || 'sim.smogon.com'
-		this._port = opts.port || 8000
+		this._server = opts.server || 'sim3.psim.us'
+		this._port = opts.port || 443
 		this._timeout = opts.timeout || (30 * 1000)
 		this._loginServer = opts.loginServer || "https://play.pokemonshowdown.com/~~showdown/action.php"
 		this._deconstructedUrl = url.parse(this._loginServer)
