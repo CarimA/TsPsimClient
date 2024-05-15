@@ -93,8 +93,7 @@ export class Client {
 	}
 
 	public isLoggedIn() : boolean {
-		return (this.isConnected 
-			&& this._isLoggedIn === true)
+		return (this.isConnected() && this._isLoggedIn === true)
 	}
 
 	private retryConnection() : void {
